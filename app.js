@@ -15,6 +15,8 @@ let country;
 let postcode;
 let city;
 
+
+// finding users current location 
 function latLongFinder() {
     return new Promise((resolve, reject) => {
         if ('geolocation' in navigator) {
@@ -31,6 +33,7 @@ function latLongFinder() {
 
 latLongFinder()
     .then((data) => {
+        // seting latitude and longitude values first 
         table.rows[1].cells[1].innerText = data.lat;
         table.rows[1].cells[3].innerText = data.long;
         return fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${data.lat}&lon=${data.long}&format=json&apiKey=${apiKey}`)
@@ -40,6 +43,7 @@ latLongFinder()
         return timeZone.results
     }).then((obj) => {
 
+        // setting result values in current timezone 
         nameOfTimeZone = obj[0].timezone.name;
         offsetSTD = obj[0].timezone.offset_STD;
         offsetDSTSeconds = obj[0].timezone.offset_STD_seconds;
@@ -64,6 +68,7 @@ latLongFinder()
         alert(err)
     })
 
+// getting timezone by user input    
 function timzeZoneByAddress(address) {
     const encodedAddress = encodeURIComponent(address);
     return fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${apiKey}`)
@@ -79,7 +84,9 @@ function formHandler(e) {
         timzeZoneByAddress(address)
             .then(res => res.json())
             .then((data) => {
-                console.log(data.features)
+
+                // Clear previous results
+                resultWrraperDiv.innerHTML = '';
 
                 let resultDiv = document.createElement("div");
                 resultDiv.innerHTML = `
@@ -127,12 +134,12 @@ function formHandler(e) {
             </table>
             `
                 resultWrraperDiv.appendChild(resultDiv)
-            }).catch((err)=>{
-               alert(`Something went wrong ${err}`)
+            }).catch((err) => {
+                alert(`Something went wrong ${err}`)
             })
     }
+    event.target.reset();
 
 }
 
 form.addEventListener("submit", formHandler)
-
